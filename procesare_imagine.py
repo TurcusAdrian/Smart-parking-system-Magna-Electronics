@@ -16,7 +16,7 @@ camera.configure(camera_config)
 
 camera.start_preview(Preview.QTGL)
 camera.start()
-time.sleep(10)
+time.sleep(5)
 camera.capture_file("alabala.jpg")
 camera.stop_preview()
 
@@ -110,42 +110,21 @@ Cropped = gray[topx:bottomx+1, topy:bottomy+1]
 
 #Read the number plate 
 
-text = pytesseract.image_to_string(Cropped, config='-l eng --oem 3 --psm 12')
+text = pytesseract.image_to_string(Cropped, config='-l eng --oem 3 --psm 8')
 
-print("Detected Number is:",text)
+#print("Detected Number is:",text)
 license_plate = RoLicensePlate(text)
 #validare county
-print(f"validare judet: {license_plate.validate_county()}")
+#print(f"validare judet: {license_plate.validate_county()}")
 
 
 #mai adauga validari - combinatii de litere care incep cu I sau O / III sau OOO 
-print(f"validare litere: {license_plate.validate_letters()}")
-print(f"validare numere: {license_plate.validate_number()}")
-if license_plate.validate_county() & license_plate.validate_letters(): 
-    if license_plate.validate_number():   #daca s-a trecut cu bine de verificarile din functiile validate_county() si validate_Letters()
-        print("Nr.inmatriculare valid")                                      #atunci numarul de inmatriculare este valid
-else: print("Nr.inmatriculare invalid")
-#numere rosii
-if license_plate.red_license_plate():
-    print("Numar rosu valid")
-else:
-    print("Numar rosu invalid")
-    
+#print(f"validare litere: {license_plate.validate_letters()}")
+#print(f"validare numere: {license_plate.validate_number()}")
+if license_plate.red_license_plate() or license_plate.diplomatic_license_plate() or license_plate.government_licence_plate() or (license_plate.validate_county() and license_plate.validate_letters() and license_plate.validate_number()):
+    print("Valid " + text)                                      
+else: print("Invalid")
 
-#numere diplomatice
-if license_plate.diplomatic_license_plate():
-    print("Numar diplomatic valid")
-else:
-    print("Numar diplomatic invalid")
-    
-    
-#numere de inmatriculare rezervate pt institutii de stat
-if license_plate.government_licence_plate():
-    print("Masina a unei institutii de stat")
-    
-
-
-    
 #numerele din Bucuresti au 3 cifre
 #pt mai, deschide direct bariera
 cv2.imshow('image',img)
@@ -156,3 +135,6 @@ cv2.imshow('Cropped',Cropped)
 cv2.waitKey(0)
 
 cv2.destroyAllWindows()
+camera.stop()
+camera.close()
+
