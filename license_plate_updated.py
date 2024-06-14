@@ -24,11 +24,10 @@ class RoLicensePlate:
         #5) after the numbers, we have the letters
         
         license_str = license_str.replace(" ","")
-        print(license_str)
-        
+        #print(license_str)
         found_county = False
-        
-        if (license_str[0].isalpha() and len(license_str) != 8 and license_str.isupper()):
+       
+        if (license_str[0].isalpha() and license_str.isupper()):  #len(license_str) != 9
             for i in license_str:
                 if i.isalpha():
                     if not found_county:
@@ -45,7 +44,10 @@ class RoLicensePlate:
                 
                 
         self.numbers = int(self.numbers)
-        
+        #print(self.county)
+        #print("dupa corectie")
+        self.correction_county()
+        #print(self.county)
                 
     def __repr__(self):
         return f"<RoLicensePlate county={self.county}, numbers ={self.numbers}, letters = {self.letters}"
@@ -96,7 +98,7 @@ class RoLicensePlate:
            return 1
        
        if numar_cifre == 6:
-        return self.red_license_plate(self)
+        return self.red_license_plate()
 
        return 0
         
@@ -110,11 +112,12 @@ class RoLicensePlate:
             if government_letters == self.letters:
                 return 1
         return 0
+    
 
     #numere rosii: TM 023456
     def red_license_plate(self):
         numar_cifre = self.count_()
-       # print(numar_cifre)
+        
         if self.validate_county() and  numar_cifre == 6 and len(self.letters) == 0:   
             return 1
         
@@ -133,3 +136,10 @@ class RoLicensePlate:
                     return 1
         
         return 0
+
+    def correction_county(self):
+        
+        if len(self.county)>2:
+            self.county = self.county[-2]+self.county[-1]
+            
+            
