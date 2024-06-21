@@ -11,29 +11,29 @@ Servo Servo2;
 LiquidCrystal_I2C lcd(0x27,20,4);
 
 //sonare intrare in parcare 
-const int trigPin = 9; 
-const int echoPin = 10; 
+const int trigPin = 2; 
+const int echoPin = 3; 
 
 const int trigPin2 = 5;
-const int echoPin2 = 6;
+const int echoPin2 = 4;
 
 //servo intrare
-const int servoPin = 3; 
+const int servoPin = 6; 
 
 //sonare iesire din parcare
-const int trigPin3 = 2;
-const int echoPin3 = 4;   //aici
+const int trigPin3 = 10;
+const int echoPin3 = 11;   
 
 const int trigPin4 = 8;
-const int echoPin4 = 11;
+const int echoPin4 = 9;
 
 //servo iesire
-const int servoPin2 = 7;
+const int servoPin2 = 12;
 
 //semafor
-const int greenLight = A3;
-const int yellowLight = A2;
-const int redLight = A1;
+//const int greenLight = A3;
+//const int yellowLight = A2;
+//const int redLight = A1;
 
 long duration; 
 long duration2;
@@ -46,7 +46,7 @@ long ex_distance1;
 long ex_distance2;
 
 int open_entrance=0, open_exit = 0;
-int parkingSpots = 50;
+static int parkingSpots = 50;
 String command;
 
 static int is_first_time = 0;
@@ -74,9 +74,9 @@ const unsigned long timeoutDuration = 20000; // 10 seconds
 
 void setup() {
   
-  pinMode(greenLight, OUTPUT);
-  pinMode(yellowLight, OUTPUT);
-  pinMode(redLight, OUTPUT);
+  //pinMode(greenLight, OUTPUT);
+  //pinMode(yellowLight, OUTPUT);
+  //pinMode(redLight, OUTPUT);
 
   Servo1.attach(servoPin); 
   Servo1.write(0);
@@ -99,7 +99,7 @@ void setup() {
   lcd.init();
   lcd.backlight();
 
-  analogWrite(redLight,HIGH);
+  //analogWrite(redLight,HIGH);
 
   Serial.begin(9600); // Starts the serial communication on baud rate 9600
 }
@@ -150,7 +150,15 @@ void loop() {
         // Entrance state machine
         switch (entranceState) {
             case WAITING_FOR_CAR:
-                if (en_distance1 < 10 && open_entrance == 0) { // Car detected at entrance
+                        lcd.clear();
+                        lcd.setCursor(2, 0);
+                        lcd.print("Team1 Magna");
+                        lcd.setCursor(2, 2);
+                    //    String lcdPrint= "Mai sunt "+= parkingSpots +=" locuri libere";
+                        lcd.print("Locuri libere: ");
+                         //lcd.setCursor(3, 0);
+                         lcd.print(parkingSpots);
+                if (en_distance1 < 5 && open_entrance == 0) { // Car detected at entrance
                     Serial.println("Car detected at entrance");
                     entranceState = CAR_DETECTED;
                     carDetectedTime = currentTime;
@@ -167,11 +175,11 @@ void loop() {
                 break;
 
             case OPEN_BARRIER:
-                analogWrite(redLight, LOW);
-                analogWrite(yellowLight, HIGH);
-                delay(500);
-                analogWrite(yellowLight, LOW);
-                analogWrite(greenLight, HIGH);
+                //analogWrite(redLight, LOW);
+              //  analogWrite(yellowLight, HIGH);
+               // delay(500);
+               // analogWrite(yellowLight, LOW);
+              //  analogWrite(greenLight, HIGH);
                 lcd.clear();
                 lcd.setCursor(3, 0);
                 lcd.print("Masina intra");
@@ -180,13 +188,13 @@ void loop() {
                 Servo1.write(90);
                 delay(2000);
 
-                if (en_distance1 > 10 && en_distance2 > 10 && open_entrance == 1) { // Car has entered
+                if (en_distance1 > 5 && en_distance2 > 5 && open_entrance == 1) { // Car has entered
                     
-                    analogWrite(greenLight, LOW);
+                   // analogWrite(greenLight, LOW);
                     lcd.clear();
                     lcd.setCursor(3, 0);
                     lcd.print("Masina a intrat");
-
+                    parkingSpots--;
                     open_entrance = 0;
                     Servo1.write(0);
                     delay(2000);
@@ -199,7 +207,7 @@ void loop() {
         // Exit state machine
         switch (exitState) {
             case WAITING_FOR_EXIT_CAR:
-                if (ex_distance1 < 10 && open_exit == 0) { // Car detected at exit
+                if (ex_distance1 < 5 && open_exit == 0) { // Car detected at exit
                     Serial.println("Car detected at exit");
                     exitState = EXIT_CAR_DETECTED;
                     exitCarDetectedTime = currentTime;
@@ -224,11 +232,11 @@ void loop() {
                 Servo2.write(90);
                 delay(2000);
 
-                if (ex_distance1 > 10 && ex_distance2 > 10 && open_exit == 1) { // Car has exited
+                if (ex_distance1 > 5 && ex_distance2 > 5 && open_exit == 1) { // Car has exited
                     lcd.clear();
                     lcd.setCursor(3, 0);
                     lcd.print("Masina a iesit");
-
+                    parkingSpots++;
                     open_exit = 0;
                     Servo2.write(0);
                     delay(2000);
